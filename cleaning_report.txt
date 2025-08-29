@@ -1,0 +1,19 @@
+Data Cleaning Report
+
+This report summarizes the cleaning process applied to a dataset initially containing 1156 rows and 7 columns.  After cleaning, the dataset now contains 1155 rows and 7 columns.
+
+The following cleaning steps were performed:
+
+1. **Duplicate Row Removal:** One duplicate row was identified and removed to ensure data accuracy and avoid bias in analysis.  This resulted in a reduction from 1156 to 1155 rows.
+
+2. **Missing Value Imputation:** Missing values were present in several columns and were addressed using the mode (most frequent value) imputation method.  This is a suitable approach given the nature of the data and the relatively small number of missing values.  Specifically:
+    * **END_DATE:** Missing values were filled with '01-01-2016 21:17'.
+    * **CATEGORY:** Missing values were filled with 'Business'.
+    * **START:** Missing values were filled with 'Cary'.
+    * **STOP:** Missing values were filled with 'Cary'.
+    * **PURPOSE:** Missing values were filled with 'Meeting'.
+
+The mode imputation was chosen to maintain data consistency and prevent the introduction of spurious information that might skew the results of any subsequent analysis.  More sophisticated imputation techniques could be considered if a larger proportion of missing data were present.
+
+
+The cleaned dataset is now ready for further analysis, free from duplicate entries and with complete data in all relevant columns.
