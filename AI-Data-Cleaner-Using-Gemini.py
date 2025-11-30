@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""AI Data Cleaner with Streamlit - Error Fixed"""
+"""AI Data Cleaner with Streamlit - Fixed Version"""
 
 import streamlit as st
 import pandas as pd
@@ -14,13 +14,17 @@ st.title("🧹 AI Data Cleaner using Gemini")
 # -------------------------
 # API Key Input
 # -------------------------
-api_key = st.text_input("🔑 Enter your Gemini API Key", type="password", help="Get your API key from https://makersuite.google.com/app/apikey")
+api_key = st.text_input(
+    "🔑 Enter your Gemini API Key", 
+    type="password", 
+    help="Get your API key from https://aistudio.google.com/app/apikey"
+)
 
 if api_key:
     try:
         # Configure Gemini with user-provided key
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("models/gemini-2.5-flash")
         st.success("✅ API Key configured successfully!")
     except Exception as e:
         st.error(f"❌ Error configuring API: {str(e)}")
@@ -32,7 +36,10 @@ else:
 # -------------------------
 # File Upload
 # -------------------------
-uploaded_file = st.file_uploader("📂 Upload your dataset (CSV or Excel)", type=["csv", "xlsx"])
+uploaded_file = st.file_uploader(
+    "📂 Upload your dataset (CSV or Excel)", 
+    type=["csv", "xlsx"]
+)
 
 if uploaded_file:
     try:
@@ -70,11 +77,11 @@ if uploaded_file:
             for col in cleaned_df.columns:
                 null_count = cleaned_df[col].isnull().sum()
                 if null_count > 0:
-                    if cleaned_df[col].dtype in ["int64", "float64"]:
+                    if pd.api.types.is_numeric_dtype(cleaned_df[col]):
                         mean_val = cleaned_df[col].mean()
                         cleaned_df[col].fillna(mean_val, inplace=True)
                         cleaning_steps.append(
-                            f"Filled {null_count} missing values in **{col}** with mean ({mean_val:.2f})."
+                            f"Filled {null_count} missing values in '{col}' with mean ({mean_val:.2f})."
                         )
                     else:
                         # Handle mode safely
@@ -85,28 +92,32 @@ if uploaded_file:
                             mode_val = "Unknown"
                         cleaned_df[col].fillna(mode_val, inplace=True)
                         cleaning_steps.append(
-                            f"Filled {null_count} missing values in **{col}** with mode ('{mode_val}')."
+                            f"Filled {null_count} missing values in '{col}' with mode ('{mode_val}')."
                         )
         
         # -------------------------
         # 3. Create cleaning summary prompt
         # -------------------------
-        summary_prompt = f"""
-You are an AI Data Cleaner. The dataset had {df.shape[0]} rows and {df.shape[1]} columns.
+        steps_text = "\n".join(cleaning_steps) if cleaning_steps else "No cleaning was required."
+        
+        summary_prompt = f"""You are an AI Data Cleaner. The dataset had {df.shape[0]} rows and {df.shape[1]} columns.
 After cleaning, it has {cleaned_df.shape[0]} rows and {cleaned_df.shape[1]} columns.
 
 Cleaning steps performed:
-{chr(10).join(cleaning_steps) if cleaning_steps else "No cleaning was required."}
+{steps_text}
 
-Write a clear, human-like summary report explaining what was cleaned and why.
-"""
+Write a clear, human-like summary report explaining what was cleaned and why."""
         
         # -------------------------
         # 4. Generate Gemini summary
         # -------------------------
         with st.spinner("🤖 Generating AI cleaning report..."):
-            response = model.generate_content(summary_prompt)
-            report_text = response.text
+            try:
+                response = model.generate_content(summary_prompt)
+                report_text = response.text
+            except Exception as e:
+                st.error(f"❌ Error generating report: {str(e)}")
+                report_text = f"**Automated Cleaning Report**\n\n{steps_text}"
         
         # -------------------------
         # 5. Show results
@@ -121,9 +132,8 @@ Write a clear, human-like summary report explaining what was cleaned and why.
         # -------------------------
         # 6. Download cleaned dataset
         # -------------------------
-        csv_buffer = io.BytesIO()
+        csv_buffer = io.StringIO()
         cleaned_df.to_csv(csv_buffer, index=False)
-        csv_buffer.seek(0)
         
         st.download_button(
             label="⬇️ Download Cleaned Dataset",
@@ -157,5 +167,5 @@ st.markdown("""
 - The tool automatically removes duplicates and fills missing values
 - Numeric columns use mean for missing values
 - Text columns use mode (most common value) for missing values
-- Get your free Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+- Get your free Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 """)
