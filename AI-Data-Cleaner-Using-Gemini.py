@@ -626,17 +626,34 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
     story.append(metrics_tbl)
     story.append(Spacer(1, 24))
 
-    # AI Summary — robust section-by-section rendering
+    # AI Summary — compact: one paragraph per section (first 3 sentences max)
     story.append(Paragraph("AI-Generated Analysis", h2_style))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=BORDER, spaceAfter=12))
+    story.append(HRFlowable(width="100%", thickness=0.5, color=BORDER, spaceAfter=10))
 
     import re as _re
 
     _section_colors = [ACCENT, RED, YELLOW, PURPLE, GREEN, ORANGE, ACCENT]
 
+    def _first_sentences(text, n=3):
+        """Return first n sentences from a block of text, stripped of markdown."""
+        text = _re.sub(r'\*\*(.*?)\*\*', r'\1', text)          # strip bold
+        text = _re.sub(r'^[-*]\s+', '', text, flags=_re.MULTILINE)  # strip bullets
+        text = _re.sub(r'^\d+\.\s+', '', text, flags=_re.MULTILINE) # strip numbered
+        text = ' '.join(text.split())                            # collapse whitespace
+        # Split on sentence-ending punctuation
+        parts = _re.split(r'(?<=[.!?])\s+', text)
+        return ' '.join(parts[:n])
+
     _ai_norm = _re.sub(r'^\s*##\s+', '##SPLIT##', ai_summary.strip(), flags=_re.MULTILINE)
     _raw_sections = _ai_norm.split('##SPLIT##')
 
+    # Build a two-column compact table: [Section title | Summary paragraph]
+    sec_label_sty = ParagraphStyle("secl", fontName="Helvetica-Bold", fontSize=8,
+        textColor=ACCENT, leading=12, spaceAfter=0)
+    sec_body_sty  = ParagraphStyle("secb", fontName="Helvetica", fontSize=8,
+        textColor=MUTED, leading=12, spaceAfter=0)
+
+    ai_tbl_rows = []
     _sec_idx = 0
     for _raw in _raw_sections:
         _raw = _raw.strip()
@@ -645,47 +662,34 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
         _lines = _raw.split('\n', 1)
         _sec_title = _re.sub(r'^#+\s*', '', _lines[0]).strip()
         _sec_body  = _lines[1].strip() if len(_lines) > 1 else ""
+        if not _sec_title:
+            continue
 
         _col = _section_colors[_sec_idx % len(_section_colors)]
         _sec_idx += 1
 
-        sec_title_sty = ParagraphStyle(
-            f"sth{_sec_idx}", fontName="Helvetica-Bold", fontSize=10,
-            textColor=_col, leading=14, spaceBefore=6, spaceAfter=4
-        )
-        story.append(Paragraph(sanitize_for_pdf(_sec_title.upper()), sec_title_sty))
+        lbl_sty = ParagraphStyle(f"lbl{_sec_idx}", fontName="Helvetica-Bold",
+            fontSize=8, textColor=_col, leading=12)
+        summary = _first_sentences(_sec_body, 3)
+        ai_tbl_rows.append([
+            Paragraph(sanitize_for_pdf(_sec_title.upper()), lbl_sty),
+            Paragraph(sanitize_for_pdf(summary), sec_body_sty),
+        ])
 
-        _body_lines = _sec_body.split('\n')
-        for _bl in _body_lines:
-            _bl = _bl.strip()
-            if not _bl:
-                story.append(Spacer(1, 3))
-                continue
-            # Strip markdown bold **text**
-            _bl_clean = _re.sub(r'\*\*(.*?)\*\*', r'\1', _bl)
-            _bl_safe = sanitize_for_pdf(_bl_clean)
+    if ai_tbl_rows:
+        ai_tbl = Table(ai_tbl_rows, colWidths=[4.5*cm, 12.7*cm])
+        ai_tbl.setStyle(TableStyle([
+            ("ROWBACKGROUNDS", (0,0), (-1,-1), [HexColor("#080B14"), HexColor("#0A0D18")]),
+            ("GRID", (0,0), (-1,-1), 0.4, BORDER),
+            ("LEFTPADDING", (0,0), (-1,-1), 8),
+            ("RIGHTPADDING", (0,0), (-1,-1), 8),
+            ("TOPPADDING", (0,0), (-1,-1), 7),
+            ("BOTTOMPADDING", (0,0), (-1,-1), 7),
+            ("VALIGN", (0,0), (-1,-1), "TOP"),
+        ]))
+        story.append(ai_tbl)
 
-            if _bl_clean.startswith('- ') or _bl_clean.startswith('* '):
-                # FIX: Use leftIndent + plain bullet prefix instead of invalid bulletText/bulletColor params
-                bullet_sty = ParagraphStyle(
-                    f"bul{_sec_idx}_{id(_bl)}", fontName="Helvetica", fontSize=9,
-                    textColor=MUTED, leading=14, leftIndent=14, spaceAfter=2,
-                    firstLineIndent=-8
-                )
-                story.append(Paragraph("> " + sanitize_for_pdf(_bl_clean[2:]), bullet_sty))
-            elif _re.match(r'^\d+\.', _bl_clean):
-                _, rest = _bl_clean.split('.', 1)
-                num_sty = ParagraphStyle(
-                    f"num{_sec_idx}_{id(_bl)}", fontName="Helvetica", fontSize=9,
-                    textColor=MUTED, leading=14, leftIndent=16, spaceAfter=2
-                )
-                story.append(Paragraph(sanitize_for_pdf(rest.strip()), num_sty))
-            else:
-                story.append(Paragraph(_bl_safe, body_style))
-
-        story.append(HRFlowable(width="100%", thickness=0.3, color=BORDER, spaceAfter=8, spaceBefore=6))
-
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 14))
 
     # Cleaning Steps
     story.append(Paragraph("Cleaning Operations Log", h2_style))
@@ -695,15 +699,23 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
         [Paragraph("#", badge_style), Paragraph("TYPE", badge_style), Paragraph("DESCRIPTION", badge_style)]
     ]
     steps_rows = []
-    for i, (stype, sdesc) in enumerate(cleaning_steps, 1):
-        # FIX: Use ASCII-safe type indicators instead of unicode symbols
+    MAX_STEPS_SHOWN = 50
+    steps_to_show = cleaning_steps[:MAX_STEPS_SHOWN]
+    for i, (stype, sdesc) in enumerate(steps_to_show, 1):
         type_color = YELLOW if stype == "duplicate" else (ACCENT if "num" in stype else GREEN)
         type_sty = ParagraphStyle(f"ts{i}", fontName="Helvetica-Bold", fontSize=8, textColor=type_color)
         desc_sty = ParagraphStyle(f"ds{i}", fontName="Courier", fontSize=8, textColor=TEXT, leading=12)
         steps_rows.append([
             Paragraph(str(i), body_style),
             Paragraph(sanitize_for_pdf(stype.upper()), type_sty),
-            Paragraph(sanitize_for_pdf(sdesc), desc_sty)
+            Paragraph(sanitize_for_pdf(sdesc[:120]), desc_sty)
+        ])
+    if len(cleaning_steps) > MAX_STEPS_SHOWN:
+        overflow_sty = ParagraphStyle("ov", fontName="Helvetica", fontSize=8, textColor=MUTED)
+        steps_rows.append([
+            Paragraph("...", body_style),
+            Paragraph("MORE", overflow_sty),
+            Paragraph(f"...and {len(cleaning_steps) - MAX_STEPS_SHOWN} more ops (see full log in app)", overflow_sty)
         ])
 
     if not steps_rows:
@@ -1118,7 +1130,15 @@ with right_col:
             """, unsafe_allow_html=True)
 
             steps_text = "\n".join(f"- [{s[0]}] {s[1]}" for s in all_steps) if all_steps else "No cleaning steps were required."
-            prompt = f"""You are a senior data scientist and analyst. Analyze this data cleaning operation and return a DETAILED structured report using EXACTLY this format with these exact section headers (use ## for each section heading):
+            prompt = f"""You are a senior data scientist and analyst. Analyze this data cleaning operation and return a DETAILED structured report.
+
+IMPORTANT FORMATTING RULES:
+- Use ONLY plain markdown. Do NOT output HTML tags, <div>, <span>, or any HTML whatsoever.
+- Use ## for each section heading (exactly two hash symbols).
+- Use plain text, bullet points with "- ", and numbered lists with "1. ".
+- Bold important words with **double asterisks**.
+
+Use EXACTLY these section headers:
 
 ## Dataset Overview
 Describe the original dataset size, shape, column count, and what kind of data this likely represents based on the stats.
@@ -1153,7 +1173,7 @@ Columns: {list(df.columns[:20])}
 Operations log:
 {steps_text}
 
-Be thorough and specific. Use real numbers from the stats above. Each section should have at least 3-5 sentences of meaningful insight."""
+Be thorough and specific. Use real numbers from the stats above. Each section should have at least 3-5 sentences of meaningful insight. Output ONLY markdown, no HTML."""
 
             with st.spinner("Gemini is writing your detailed report..."):
                 try:
@@ -1162,9 +1182,54 @@ Be thorough and specific. Use real numbers from the stats above. Each section sh
                 except Exception as e:
                     ai_text = f"## Automated Report\n\n{steps_text}"
 
-            # Parse and render sections
-            import re
-            ai_text_norm = re.sub(r'^\s*##\s+', '##SPLIT##', ai_text.strip(), flags=re.MULTILINE)
+            # ── Normalise Gemini output → clean markdown ──────────────────────
+            import re, html as _html
+
+            def _gemini_to_markdown(raw):
+                """Robustly convert any Gemini output (markdown OR html) to plain markdown."""
+                t = str(raw or "")
+                # Strip fenced code wrappers Gemini sometimes adds around the whole reply
+                t = re.sub(r"^```[a-z]*\n?", "", t.strip(), flags=re.IGNORECASE)
+                t = re.sub(r"\n?```$", "", t.strip())
+                # If it looks like HTML, convert to plain text + markdown
+                if re.search(r"(?i)<(div|span|p|h[1-6]|ul|ol|li|section)\b", t):
+                    # Recover bold/strong first
+                    t = re.sub(r"(?i)<(?:strong|b)[^>]*>(.*?)</(?:strong|b)>", r"**\1**", t, flags=re.DOTALL)
+                    # Recover real h1-h3 tags as ## headings
+                    t = re.sub(r"(?i)<h[1-3][^>]*>(.*?)</h[1-3]>", r"\n## \1\n", t, flags=re.DOTALL)
+                    # Detect Gemini's section-title pattern: a span whose text matches a known heading
+                    # e.g. <span ...>Dataset Overview</span> inside a header div
+                    known_headings = [
+                        "Dataset Overview", "Issues Detected", "Cleaning Actions Performed",
+                        "Data Quality Score", "Statistical Impact", "Recommendations", "Conclusion"
+                    ]
+                    for heading in known_headings:
+                        # Match span containing the heading text (possibly with surrounding whitespace)
+                        t = re.sub(
+                            r'<span[^>]*>\s*' + re.escape(heading) + r'\s*</span>',
+                            f'\n## {heading}\n',
+                            t, flags=re.IGNORECASE
+                        )
+                    # Turn <li> into bullet points
+                    t = re.sub(r"(?i)<li[^>]*>(.*?)</li>", r"\n- \1", t, flags=re.DOTALL)
+                    # Block-level tags → newlines
+                    t = re.sub(r"(?i)<br\s*/?>", "\n", t)
+                    t = re.sub(r"(?i)</(div|p|h[1-6]|section|article|ul|ol)>", "\n", t)
+                    # Strip all remaining tags
+                    t = re.sub(r"<[^>]+>", "", t)
+                    t = _html.unescape(t)
+                    # Remove lines that are just emoji or whitespace (leftover icon spans)
+                    t = re.sub(r"^\s*[\U0001F000-\U0001FFFF\u2600-\u27BF]+\s*$", "", t, flags=re.MULTILINE)
+                    # Convert any stray unicode bullets/arrows to "- " list items
+                    t = re.sub(r"^\s*[▸►▶•·‣⁃]\s*", "- ", t, flags=re.MULTILINE)
+                # Collapse excess blank lines
+                t = re.sub(r"\n{3,}", "\n\n", t)
+                return t.strip()
+
+            ai_text_clean = _gemini_to_markdown(ai_text)
+
+            # ── Split into sections on ## headings ────────────────────────────
+            ai_text_norm = re.sub(r'^\s*##\s+', '##SPLIT##', ai_text_clean, flags=re.MULTILINE)
             raw_sections = ai_text_norm.split('##SPLIT##')
 
             rendered_sections = ""
@@ -1186,6 +1251,16 @@ Be thorough and specific. Use real numbers from the stats above. Each section sh
                 "Recommendations": "#F97316",
                 "Conclusion": "#40C8FF",
             }
+
+            def _safe(text):
+                """HTML-escape plain text for safe insertion into HTML attributes/content."""
+                return _html.escape(str(text), quote=False)
+
+            def _render_bold(text):
+                """Convert **bold** markdown to <strong> tags (after escaping)."""
+                escaped = _safe(text)
+                return re.sub(r'\*\*(.*?)\*\*', r'<strong style="color:#E8EBF4;">\1</strong>', escaped)
+
             for s in raw_sections:
                 s = s.strip()
                 if not s:
@@ -1193,42 +1268,54 @@ Be thorough and specific. Use real numbers from the stats above. Each section sh
                 lines = s.split('\n', 1)
                 title = re.sub(r'^#+\s*', '', lines[0]).strip()
                 body  = lines[1].strip() if len(lines) > 1 else ""
+                if not title:
+                    continue
                 icon  = section_icons.get(title, "&#10022;")
                 color = section_colors.get(title, "#40C8FF")
-                if title not in section_icons and not body:
-                    continue
 
                 body_html = ""
                 for line in body.split('\n'):
                     line = line.strip()
-                    if not line:
+                    if not line or line == "---":
                         continue
-                    line = re.sub(r'\*\*(.*?)\*\*', r'<strong style="color:#E8EBF4;">\1</strong>', line)
                     if line.startswith('- ') or line.startswith('* '):
-                        body_html += f'<div style="display:flex;gap:10px;margin:6px 0;"><span style="color:{color};flex-shrink:0;margin-top:3px;font-size:11px;">&#9656;</span><span style="color:#A8B0C8;font-size:13.5px;line-height:1.7;">{line[2:]}</span></div>'
+                        body_html += (
+                            f'<div style="display:flex;gap:10px;margin:6px 0;">'
+                            f'<span style="color:{color};flex-shrink:0;margin-top:3px;font-size:11px;">&#9656;</span>'
+                            f'<span style="color:#A8B0C8;font-size:13.5px;line-height:1.7;">{_render_bold(line[2:])}</span>'
+                            f'</div>'
+                        )
                     elif re.match(r'^\d+\.', line):
                         num, rest = line.split('.', 1)
-                        body_html += f'<div style="display:flex;gap:10px;margin:8px 0;"><span style="color:{color};font-family:DM Mono,monospace;font-size:11px;font-weight:700;flex-shrink:0;width:22px;padding-top:2px;">{num}.</span><span style="color:#A8B0C8;font-size:13.5px;line-height:1.7;">{rest.strip()}</span></div>'
+                        body_html += (
+                            f'<div style="display:flex;gap:10px;margin:8px 0;">'
+                            f'<span style="color:{color};font-family:DM Mono,monospace;font-size:11px;font-weight:700;flex-shrink:0;width:22px;padding-top:2px;">{_safe(num)}.</span>'
+                            f'<span style="color:#A8B0C8;font-size:13.5px;line-height:1.7;">{_render_bold(rest.strip())}</span>'
+                            f'</div>'
+                        )
                     else:
-                        body_html += f'<p style="color:#A8B0C8;font-size:13.5px;line-height:1.8;margin:8px 0;">{line}</p>'
+                        body_html += f'<p style="color:#A8B0C8;font-size:13.5px;line-height:1.8;margin:8px 0;">{_render_bold(line)}</p>'
 
-                rendered_sections += f"""
-                <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
-                  border-left:3px solid {color};border-radius:12px;padding:20px 24px;margin-bottom:16px;">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-                    <span style="font-size:18px;">{icon}</span>
-                    <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
-                      text-transform:uppercase;letter-spacing:0.08em;color:{color};">{title}</span>
-                  </div>
-                  <div>{body_html}</div>
-                </div>"""
+                rendered_sections += (
+                    f'<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);'
+                    f'border-left:3px solid {color};border-radius:12px;padding:20px 24px;margin-bottom:16px;">'
+                    f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">'
+                    f'<span style="font-size:18px;">{icon}</span>'
+                    f'<span style="font-family:\'Syne\',sans-serif;font-size:13px;font-weight:700;'
+                    f'text-transform:uppercase;letter-spacing:0.08em;color:{color};">{_safe(title)}</span>'
+                    f'</div><div>{body_html}</div></div>'
+                )
 
-            st.markdown(f"""
-            <div class="ai-report">
-              <div class="ai-badge">* Gemini AI - Detailed Analysis Report - {datetime.datetime.now().strftime("%H:%M:%S")}</div>
-              {rendered_sections}
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="ai-report">'
+                f'<div class="ai-badge">* Gemini AI - Detailed Analysis Report - {datetime.datetime.now().strftime("%H:%M:%S")}</div>'
+                f'{rendered_sections}'
+                f'</div>',
+                unsafe_allow_html=True
+            )
+
+            # Pass clean markdown (not HTML) to PDF builder
+            ai_text = ai_text_clean
 
             # Preview cleaned
             with st.expander("Preview Cleaned Dataset (first 20 rows)"):
