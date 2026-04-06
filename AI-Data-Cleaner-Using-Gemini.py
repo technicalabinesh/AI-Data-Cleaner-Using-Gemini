@@ -8,6 +8,7 @@ import io
 import time
 import datetime
 import math
+import re
 import google.generativeai as genai
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
