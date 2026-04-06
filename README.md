@@ -1,4 +1,4 @@
-# 🧹 AI Data Cleaner using Google Gemini
+# Gemini The Data Analyzer
 
 **AI Data Cleaner** is a Python-based application powered by **Google Gemini** that automatically cleans datasets like a human data analyst. It is designed to handle **large datasets (100,000+ rows)** and generates a detailed, human-readable summary of all cleaning actions performed. This tool is perfect for data analysts, students, and professionals who want to quickly clean and understand their datasets.
 
