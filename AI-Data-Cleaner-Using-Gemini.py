@@ -117,23 +117,32 @@ html, body, .stApp {
 }
 .hero-stats {
     display: flex;
-    gap: 40px;
+    gap: 14px;
     margin-top: 40px;
     justify-content: center;
+    flex-wrap: wrap;
 }
-.stat-item { text-align: center; }
+.stat-item {
+    text-align: center;
+    min-width: 132px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(64,200,255,0.14);
+    background: rgba(255,255,255,0.02);
+}
 .stat-num {
     font-family: 'Syne', sans-serif;
-    font-size: 28px;
+    font-size: 25px;
     font-weight: 700;
     color: #40C8FF;
+    line-height: 1.1;
 }
 .stat-label {
-    font-size: 12px;
-    color: #5A6178;
+    font-size: 11px;
+    color: #8B92AA;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-top: 2px;
+    margin-top: 6px;
 }
 
 /* Main Layout */
@@ -468,11 +477,11 @@ st.markdown("""
   <div class="hero-title"><span>Gemini</span> <span class="the">The</span> Data Analyzer</div>
   <div class="hero-sub">Enterprise-grade intelligent data cleaning powered by Google Gemini AI. Handles up to 10 lakh rows with chunked processing, real-time diagnostics, and structured PDF reports.</div>
   <div class="hero-stats">
-    <div class="stat-item"><div class="stat-num">10L+</div><div class="stat-label">Max Rows</div></div>
-    <div class="stat-item"><div class="stat-num">AI</div><div class="stat-label">Smart Report</div></div>
-    <div class="stat-item"><div class="stat-num">PDF</div><div class="stat-label">Structured Export</div></div>
-    <div class="stat-item"><div class="stat-num">INF</div><div class="stat-label">Column Types</div></div>
-    <div class="stat-item"><div class="stat-num">RT</div><div class="stat-label">Real-time Logs</div></div>
+        <div class="stat-item"><div class="stat-num">10L+</div><div class="stat-label">Rows Supported</div></div>
+        <div class="stat-item"><div class="stat-num">AI</div><div class="stat-label">Insight Report</div></div>
+        <div class="stat-item"><div class="stat-num">PDF</div><div class="stat-label">Structured Export</div></div>
+        <div class="stat-item"><div class="stat-num">INF</div><div class="stat-label">Type Inference</div></div>
+        <div class="stat-item"><div class="stat-num">RT</div><div class="stat-label">Live Cleaning Logs</div></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
