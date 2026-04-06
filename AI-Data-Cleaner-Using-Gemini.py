@@ -14,7 +14,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import mm, cm
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, PageBreak, KeepTogether
+    HRFlowable, PageBreak, KeepTogether, ListFlowable, ListItem
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT, TA_JUSTIFY
@@ -26,7 +26,7 @@ from reportlab.lib.colors import HexColor
 # ─────────────────────────────────────────────
 st.set_page_config(
     page_title="Gemini The Data Analyzer",
-    page_icon="✦",
+    page_icon="*",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -35,7 +35,7 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
 
-/* ── Reset & Base ── */
+/* Reset & Base */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body, .stApp {
@@ -44,11 +44,11 @@ html, body, .stApp {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* ── Hide Streamlit chrome ── */
+/* Hide Streamlit chrome */
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
 
-/* ── Hero Banner ── */
+/* Hero Banner */
 .hero {
     background: linear-gradient(135deg, #080B14 0%, #0D1526 40%, #091220 100%);
     border-bottom: 1px solid rgba(64,200,255,0.15);
@@ -136,7 +136,7 @@ html, body, .stApp {
     margin-top: 2px;
 }
 
-/* ── Main Layout ── */
+/* Main Layout */
 .main-layout {
     display: grid;
     grid-template-columns: 360px 1fr;
@@ -152,7 +152,7 @@ html, body, .stApp {
     padding: 40px 48px;
 }
 
-/* ── Section Headers ── */
+/* Section Headers */
 .section-header {
     display: flex;
     align-items: center;
@@ -175,7 +175,7 @@ html, body, .stApp {
     color: #8B92AA;
 }
 
-/* ── Cards ── */
+/* Cards */
 .glass-card {
     background: rgba(255,255,255,0.025);
     border: 1px solid rgba(255,255,255,0.07);
@@ -195,7 +195,7 @@ html, body, .stApp {
     background: linear-gradient(90deg, transparent, rgba(64,200,255,0.3), transparent);
 }
 
-/* ── Metric Cards ── */
+/* Metric Cards */
 .metrics-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -230,7 +230,7 @@ html, body, .stApp {
     margin-top: 6px;
 }
 
-/* ── Step Indicators ── */
+/* Step Indicators */
 .step-flow {
     display: flex;
     align-items: center;
@@ -272,7 +272,7 @@ html, body, .stApp {
 .step-chip.done .step-num { background: #34D399; color: #080B14; }
 .step-arrow { color: #2A2F42; font-size: 14px; }
 
-/* ── Log Terminal ── */
+/* Log Terminal */
 .terminal {
     background: #050810;
     border: 1px solid rgba(64,200,255,0.15);
@@ -295,7 +295,7 @@ html, body, .stApp {
 .log-info { color: #40C8FF; }
 .log-text { color: #8B92AA; }
 
-/* ── Column Quality Bars ── */
+/* Column Quality Bars */
 .col-row {
     display: flex;
     align-items: center;
@@ -343,7 +343,7 @@ html, body, .stApp {
     flex-shrink: 0;
 }
 
-/* ── AI Report Box ── */
+/* AI Report Box */
 .ai-report {
     background: linear-gradient(135deg, rgba(64,200,255,0.04) 0%, rgba(123,110,246,0.04) 100%);
     border: 1px solid rgba(64,200,255,0.15);
@@ -372,7 +372,7 @@ html, body, .stApp {
     margin-bottom: 12px;
 }
 
-/* ── Download Strip ── */
+/* Download Strip */
 .dl-strip {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -398,7 +398,7 @@ html, body, .stApp {
 }
 .dl-desc { font-size: 11px; color: #5A6178; margin-top: 4px; }
 
-/* ── Streamlit overrides ── */
+/* Streamlit overrides */
 .stTextInput > div > div {
     background: rgba(255,255,255,0.04) !important;
     border: 1px solid rgba(255,255,255,0.10) !important;
@@ -464,15 +464,15 @@ h1,h2,h3 { font-family: 'Syne', sans-serif !important; }
 # ─────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-  <div class="hero-badge">✦ Google Gemini AI · v2.0 · Enterprise Grade · Built for Scale</div>
+  <div class="hero-badge">* Google Gemini AI - v2.0 - Enterprise Grade - Built for Scale</div>
   <div class="hero-title"><span>Gemini</span> <span class="the">The</span> Data Analyzer</div>
   <div class="hero-sub">Enterprise-grade intelligent data cleaning powered by Google Gemini AI. Handles up to 10 lakh rows with chunked processing, real-time diagnostics, and structured PDF reports.</div>
   <div class="hero-stats">
     <div class="stat-item"><div class="stat-num">10L+</div><div class="stat-label">Max Rows</div></div>
     <div class="stat-item"><div class="stat-num">AI</div><div class="stat-label">Smart Report</div></div>
     <div class="stat-item"><div class="stat-num">PDF</div><div class="stat-label">Structured Export</div></div>
-    <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Column Types</div></div>
-    <div class="stat-item"><div class="stat-num">⚡</div><div class="stat-label">Real-time Logs</div></div>
+    <div class="stat-item"><div class="stat-num">INF</div><div class="stat-label">Column Types</div></div>
+    <div class="stat-item"><div class="stat-num">RT</div><div class="stat-label">Real-time Logs</div></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -493,28 +493,21 @@ def get_bar_color(pct):
     if pct >= 80: return "#FBBF24"
     return "#F87171"
 
-def clean_chunk(chunk):
-    """Clean a single DataFrame chunk. Returns cleaned chunk + step list."""
-    steps = []
-    dup = chunk.duplicated().sum()
-    if dup:
-        chunk.drop_duplicates(inplace=True)
-        steps.append(("duplicate", f"Removed {dup} duplicate rows"))
-
-    for col in chunk.columns:
-        null_cnt = chunk[col].isnull().sum()
-        if null_cnt == 0:
-            continue
-        if pd.api.types.is_numeric_dtype(chunk[col]):
-            val = chunk[col].mean()
-            chunk[col].fillna(val, inplace=True)
-            steps.append(("null_num", f"'{col}': filled {null_cnt} nulls → mean {val:.3g}"))
-        else:
-            mode_s = chunk[col].mode()
-            val = mode_s[0] if len(mode_s) else "Unknown"
-            chunk[col].fillna(val, inplace=True)
-            steps.append(("null_txt", f"'{col}': filled {null_cnt} nulls → mode '{val}'"))
-    return chunk, steps
+def sanitize_for_pdf(text):
+    """Replace unicode chars not in Helvetica/Courier with ASCII equivalents."""
+    replacements = {
+        '\u2714': '(OK)', '\u2718': '(X)', '\u2022': '-', '\u25b8': '>',
+        '\u25c8': '*', '\u25c9': '*', '\u2726': '*', '\u2605': '*',
+        '\u2606': '*', '\u2713': 'OK', '\u26a0': '!', '\u2192': '->',
+        '\u2190': '<-', '\u2193': 'v', '\u2191': '^', '\u00b7': '.',
+        '\u2026': '...', '\u2018': "'", '\u2019': "'",
+        '\u201c': '"', '\u201d': '"', '\u2013': '-', '\u2014': '--',
+        '\u00a0': ' ',
+    }
+    for char, replacement in replacements.items():
+        text = text.replace(char, replacement)
+    # Remove any remaining non-latin1 characters
+    return text.encode('latin-1', errors='replace').decode('latin-1')
 
 
 def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summary, timestamp):
@@ -527,7 +520,7 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
         topMargin=2*cm, bottomMargin=2*cm
     )
 
-    # ── Palette ──
+    # Palette
     DARK     = HexColor("#080B14")
     CARD     = HexColor("#0D1526")
     ACCENT   = HexColor("#40C8FF")
@@ -541,7 +534,7 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
     BORDER   = HexColor("#1E2535")
     WHITE    = colors.white
 
-    # ── Styles ──
+    # Styles
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle("title_s", fontName="Helvetica-Bold",
@@ -561,16 +554,16 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
 
     story = []
 
-    # ── Cover ──
+    # Cover
     cover_title_sty = ParagraphStyle("ct", fontName="Helvetica-Bold",
         fontSize=30, textColor=WHITE, leading=36, spaceAfter=6, spaceBefore=20)
     cover_sub_sty = ParagraphStyle("cs", fontName="Helvetica",
         fontSize=13, textColor=MUTED, leading=18, spaceAfter=16)
-    story.append(Paragraph("Gemini The Data Analyzer", cover_title_sty))
-    story.append(Paragraph("AI-Powered Data Quality Report", cover_sub_sty))
+    story.append(Paragraph(sanitize_for_pdf("Gemini The Data Analyzer"), cover_title_sty))
+    story.append(Paragraph(sanitize_for_pdf("AI-Powered Data Quality Report"), cover_sub_sty))
     story.append(HRFlowable(width="100%", thickness=1, color=ACCENT, spaceAfter=20))
 
-    # ── Meta row ──
+    # Meta row — NOTE: no ROUNDEDCORNERS, it's not a valid TableStyle command
     meta_rows = [
         ["Generated", timestamp],
         ["Original Rows", f"{orig_shape[0]:,}"],
@@ -582,8 +575,8 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
     meta_val_style = ParagraphStyle("mv", fontName="Helvetica-Bold", fontSize=9, textColor=WHITE)
 
     meta_tbl_data = [[
-        Paragraph(r[0], meta_style_tbl),
-        Paragraph(r[1], meta_val_style)
+        Paragraph(sanitize_for_pdf(r[0]), meta_style_tbl),
+        Paragraph(sanitize_for_pdf(r[1]), meta_val_style)
     ] for r in meta_rows]
 
     meta_tbl = Table(meta_tbl_data, colWidths=[5*cm, 12*cm])
@@ -595,12 +588,12 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
         ("TOPPADDING", (0,0), (-1,-1), 8),
         ("BOTTOMPADDING", (0,0), (-1,-1), 8),
         ("GRID", (0,0), (-1,-1), 0.5, BORDER),
-        ("ROUNDEDCORNERS", [6]),
+        # FIX: Removed invalid "ROUNDEDCORNERS" command
     ]))
     story.append(meta_tbl)
     story.append(Spacer(1, 20))
 
-    # ── Summary metrics strip ──
+    # Summary metrics strip
     rows_saved = orig_shape[0] - clean_shape[0]
     pct_clean = round(100 * clean_shape[0] / orig_shape[0], 1) if orig_shape[0] else 0
     n_steps = len(cleaning_steps)
@@ -633,16 +626,14 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
     story.append(metrics_tbl)
     story.append(Spacer(1, 24))
 
-    # ── AI Summary ── (parsed into sections, rendered as individual flowables to avoid LayoutError)
+    # AI Summary — robust section-by-section rendering
     story.append(Paragraph("AI-Generated Analysis", h2_style))
     story.append(HRFlowable(width="100%", thickness=0.5, color=BORDER, spaceAfter=12))
 
     import re as _re
 
-    # Section accent colours (cycle if more sections than colours)
     _section_colors = [ACCENT, RED, YELLOW, PURPLE, GREEN, ORANGE, ACCENT]
 
-    # Robust split: normalize all ## headings regardless of leading newline
     _ai_norm = _re.sub(r'^\s*##\s+', '##SPLIT##', ai_summary.strip(), flags=_re.MULTILINE)
     _raw_sections = _ai_norm.split('##SPLIT##')
 
@@ -652,51 +643,51 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
         if not _raw:
             continue
         _lines = _raw.split('\n', 1)
-        # Strip any stray # characters from title
         _sec_title = _re.sub(r'^#+\s*', '', _lines[0]).strip()
         _sec_body  = _lines[1].strip() if len(_lines) > 1 else ""
 
         _col = _section_colors[_sec_idx % len(_section_colors)]
         _sec_idx += 1
 
-        # Section header row
         sec_title_sty = ParagraphStyle(
             f"sth{_sec_idx}", fontName="Helvetica-Bold", fontSize=10,
             textColor=_col, leading=14, spaceBefore=6, spaceAfter=4
         )
-        story.append(Paragraph(_sec_title.upper(), sec_title_sty))
+        story.append(Paragraph(sanitize_for_pdf(_sec_title.upper()), sec_title_sty))
 
-        # Body lines — each paragraph/bullet as its own Paragraph flowable
         _body_lines = _sec_body.split('\n')
         for _bl in _body_lines:
             _bl = _bl.strip()
             if not _bl:
                 story.append(Spacer(1, 3))
                 continue
-            # Strip markdown bold (**text**)
+            # Strip markdown bold **text**
             _bl_clean = _re.sub(r'\*\*(.*?)\*\*', r'\1', _bl)
+            _bl_safe = sanitize_for_pdf(_bl_clean)
+
             if _bl_clean.startswith('- ') or _bl_clean.startswith('* '):
+                # FIX: Use leftIndent + plain bullet prefix instead of invalid bulletText/bulletColor params
                 bullet_sty = ParagraphStyle(
-                    f"bul{_sec_idx}", fontName="Helvetica", fontSize=9,
-                    textColor=MUTED, leading=14, leftIndent=12,
-                    bulletText="▸", bulletColor=_col, spaceAfter=2
+                    f"bul{_sec_idx}_{id(_bl)}", fontName="Helvetica", fontSize=9,
+                    textColor=MUTED, leading=14, leftIndent=14, spaceAfter=2,
+                    firstLineIndent=-8
                 )
-                story.append(Paragraph(_bl_clean[2:], bullet_sty))
+                story.append(Paragraph("> " + sanitize_for_pdf(_bl_clean[2:]), bullet_sty))
             elif _re.match(r'^\d+\.', _bl_clean):
                 _, rest = _bl_clean.split('.', 1)
                 num_sty = ParagraphStyle(
-                    f"num{_sec_idx}", fontName="Helvetica", fontSize=9,
+                    f"num{_sec_idx}_{id(_bl)}", fontName="Helvetica", fontSize=9,
                     textColor=MUTED, leading=14, leftIndent=16, spaceAfter=2
                 )
-                story.append(Paragraph(rest.strip(), num_sty))
+                story.append(Paragraph(sanitize_for_pdf(rest.strip()), num_sty))
             else:
-                story.append(Paragraph(_bl_clean, body_style))
+                story.append(Paragraph(_bl_safe, body_style))
 
         story.append(HRFlowable(width="100%", thickness=0.3, color=BORDER, spaceAfter=8, spaceBefore=6))
 
     story.append(Spacer(1, 10))
 
-    # ── Cleaning Steps ──
+    # Cleaning Steps
     story.append(Paragraph("Cleaning Operations Log", h2_style))
     story.append(HRFlowable(width="100%", thickness=0.5, color=BORDER, spaceAfter=12))
 
@@ -705,18 +696,22 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
     ]
     steps_rows = []
     for i, (stype, sdesc) in enumerate(cleaning_steps, 1):
-        icon = "✦" if stype == "duplicate" else ("◈" if "num" in stype else "◉")
+        # FIX: Use ASCII-safe type indicators instead of unicode symbols
         type_color = YELLOW if stype == "duplicate" else (ACCENT if "num" in stype else GREEN)
         type_sty = ParagraphStyle(f"ts{i}", fontName="Helvetica-Bold", fontSize=8, textColor=type_color)
         desc_sty = ParagraphStyle(f"ds{i}", fontName="Courier", fontSize=8, textColor=TEXT, leading=12)
         steps_rows.append([
             Paragraph(str(i), body_style),
-            Paragraph(stype.upper(), type_sty),
-            Paragraph(sdesc, desc_sty)
+            Paragraph(sanitize_for_pdf(stype.upper()), type_sty),
+            Paragraph(sanitize_for_pdf(sdesc), desc_sty)
         ])
 
     if not steps_rows:
-        steps_rows = [[Paragraph("—", body_style), Paragraph("NONE", body_style), Paragraph("No cleaning operations required.", body_style)]]
+        steps_rows = [[
+            Paragraph("-", body_style),
+            Paragraph("NONE", body_style),
+            Paragraph("No cleaning operations required.", body_style)
+        ]]
 
     steps_tbl = Table(steps_header + steps_rows, colWidths=[1*cm, 3*cm, 13*cm])
     steps_tbl.setStyle(TableStyle([
@@ -735,7 +730,7 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
     story.append(steps_tbl)
     story.append(Spacer(1, 22))
 
-    # ── Column Quality Table ──
+    # Column Quality Table
     story.append(PageBreak())
     story.append(Paragraph("Column Quality Breakdown", h2_style))
     story.append(HRFlowable(width="100%", thickness=0.5, color=BORDER, spaceAfter=12))
@@ -757,12 +752,12 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
         type_sty = ParagraphStyle("ts", fontName="Courier", fontSize=8, textColor=ACCENT)
 
         col_rows.append([
-            Paragraph(cinfo["name"][:22], name_sty),
-            Paragraph(cinfo["dtype"], type_sty),
+            Paragraph(sanitize_for_pdf(cinfo["name"][:22]), name_sty),
+            Paragraph(sanitize_for_pdf(cinfo["dtype"]), type_sty),
             Paragraph(f"{pct}%", pct_sty),
             Paragraph(str(cinfo["nulls"]), body_style),
             Paragraph(str(cinfo["unique"]), body_style),
-            Paragraph(cinfo["action"], body_style),
+            Paragraph(sanitize_for_pdf(cinfo["action"]), body_style),
         ])
 
     col_tbl = Table(col_header + col_rows, colWidths=[4.5*cm, 1.8*cm, 3*cm, 2*cm, 2*cm, 3.7*cm])
@@ -779,11 +774,11 @@ def build_pdf_report(orig_shape, clean_shape, col_info, cleaning_steps, ai_summa
     story.append(col_tbl)
     story.append(Spacer(1, 24))
 
-    # ── Footer ──
+    # Footer
     story.append(HRFlowable(width="100%", thickness=0.5, color=BORDER, spaceAfter=10))
     footer_sty = ParagraphStyle("fs", fontName="Helvetica", fontSize=8, textColor=HexColor("#2A3550"))
     story.append(Paragraph(
-        f"Gemini The Data Analyzer · Report generated {timestamp} · Powered by Google Gemini AI",
+        sanitize_for_pdf(f"Gemini The Data Analyzer - Report generated {timestamp} - Powered by Google Gemini AI"),
         footer_sty
     ))
 
@@ -811,7 +806,7 @@ with left_col:
     api_key = st.text_input(
         "API Key",
         type="password",
-        placeholder="AIza··················",
+        placeholder="AIza...................",
         label_visibility="collapsed"
     )
 
@@ -824,7 +819,7 @@ with left_col:
               background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.25);
               border-radius:8px;padding:8px 14px;font-size:12px;color:#34D399;
               font-family:'DM Mono',monospace;">
-              ✓ API key verified
+              OK - API key verified
             </div>
             """, unsafe_allow_html=True)
         except Exception as e:
@@ -877,7 +872,7 @@ with left_col:
     )
 
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-    run_btn = st.button("⚡  Run Cleaning Pipeline", width='stretch')
+    run_btn = st.button("Run Cleaning Pipeline", use_container_width=True)
 
 # ─────────────────────────────────────────────
 # RIGHT PANEL
@@ -887,17 +882,17 @@ with right_col:
         st.markdown("""
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
           height:480px;text-align:center;opacity:0.4;">
-          <div style="font-size:64px;margin-bottom:20px;">📂</div>
+          <div style="font-size:64px;margin-bottom:20px;">&#128194;</div>
           <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:#E8EBF4;">
             Drop a dataset to begin
           </div>
           <div style="font-size:13px;color:#5A6178;margin-top:8px;">
-            CSV or Excel · up to 10 lakh rows supported
+            CSV or Excel - up to 10 lakh rows supported
           </div>
         </div>
         """, unsafe_allow_html=True)
     else:
-        # ── Load preview ──
+        # Load preview
         try:
             if uploaded_file.name.endswith(".csv"):
                 df_preview = pd.read_csv(uploaded_file, nrows=5)
@@ -913,36 +908,35 @@ with right_col:
             st.error(f"Could not read file: {e}")
             st.stop()
 
-        # ── Step flow ──
-        step_state = "upload"
+        # Step flow
         st.markdown(f"""
         <div class="step-flow">
           <div class="step-chip done"><div class="step-num">1</div>Upload</div>
-          <div class="step-arrow">→</div>
+          <div class="step-arrow">-&gt;</div>
           <div class="step-chip {'done' if run_btn else 'active'}"><div class="step-num">2</div>Analyse</div>
-          <div class="step-arrow">→</div>
+          <div class="step-arrow">-&gt;</div>
           <div class="step-chip {'active' if run_btn else ''}"><div class="step-num">3</div>Clean</div>
-          <div class="step-arrow">→</div>
+          <div class="step-arrow">-&gt;</div>
           <div class="step-chip {'active' if run_btn else ''}"><div class="step-num">4</div>Report</div>
-          <div class="step-arrow">→</div>
+          <div class="step-arrow">-&gt;</div>
           <div class="step-chip"><div class="step-num">5</div>Export</div>
         </div>
         """, unsafe_allow_html=True)
 
-        # ── Preview ──
+        # Preview
         st.markdown("""
         <div class="section-header" style="margin-top:8px">
           <div class="section-dot"></div>
           <div class="section-title">Dataset Preview</div>
         </div>
         """, unsafe_allow_html=True)
-        st.dataframe(df_preview, width='stretch', height=200)
+        st.dataframe(df_preview, use_container_width=True, height=200)
 
         if run_btn:
             st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
-            # ── Full load ──
-            with st.spinner("Loading full dataset…"):
+            # Full load
+            with st.spinner("Loading full dataset..."):
                 uploaded_file.seek(0)
                 if uploaded_file.name.endswith(".csv"):
                     df = pd.read_csv(uploaded_file)
@@ -951,7 +945,7 @@ with right_col:
 
             orig_shape = df.shape
 
-            # ── Diagnostics ──
+            # Diagnostics
             st.markdown("""
             <div class="section-header">
               <div class="section-dot" style="background:#FBBF24;box-shadow:0 0 10px rgba(251,191,36,0.5)"></div>
@@ -967,33 +961,33 @@ with right_col:
             with col1m:
                 st.markdown(f"""
                 <div class="metric-card accent">
-                  <div class="metric-icon">📊</div>
+                  <div class="metric-icon">&#128202;</div>
                   <div class="metric-value">{orig_shape[0]:,}</div>
                   <div class="metric-label">Total Rows</div>
                 </div>""", unsafe_allow_html=True)
             with col2m:
                 st.markdown(f"""
                 <div class="metric-card accent2">
-                  <div class="metric-icon">📋</div>
+                  <div class="metric-icon">&#128203;</div>
                   <div class="metric-value">{orig_shape[1]}</div>
                   <div class="metric-label">Columns</div>
                 </div>""", unsafe_allow_html=True)
             with col3m:
                 st.markdown(f"""
                 <div class="metric-card accent3">
-                  <div class="metric-icon">🕳️</div>
+                  <div class="metric-icon">&#128368;</div>
                   <div class="metric-value">{null_total:,}</div>
                   <div class="metric-label">Missing Values</div>
                 </div>""", unsafe_allow_html=True)
             with col4m:
                 st.markdown(f"""
                 <div class="metric-card accent4">
-                  <div class="metric-icon">🔁</div>
+                  <div class="metric-icon">&#128260;</div>
                   <div class="metric-value">{dup_total:,}</div>
                   <div class="metric-label">Duplicates</div>
                 </div>""", unsafe_allow_html=True)
 
-            # ── Column quality bars ──
+            # Column quality bars
             st.markdown("""
             <div class="section-header" style="margin-top:8px">
               <div class="section-dot" style="background:#7B6EF6;box-shadow:0 0 10px rgba(123,110,246,0.6)"></div>
@@ -1009,7 +1003,7 @@ with right_col:
                 bar_color = get_bar_color(pct)
                 dtype_lbl = get_col_type_label(df[col])
                 unique = int(df[col].nunique())
-                action = ("Fill mean" if dtype_lbl=="NUM" else ("Fill mode" if nulls>0 else "—")) if nulls else "—"
+                action = ("Fill mean" if dtype_lbl=="NUM" else ("Fill mode" if nulls>0 else "-")) if nulls else "-"
                 col_info_list.append({
                     "name": col, "dtype": dtype_lbl, "nulls": nulls,
                     "unique": unique, "completeness": pct, "action": action
@@ -1025,7 +1019,7 @@ with right_col:
             st.markdown(f'<div class="glass-card" style="max-height:300px;overflow-y:auto">{bars_html}</div>',
                         unsafe_allow_html=True)
 
-            # ── CHUNKED CLEANING ──
+            # CHUNKED CLEANING
             st.markdown("""
             <div class="section-header" style="margin-top:8px">
               <div class="section-dot" style="background:#34D399;box-shadow:0 0 10px rgba(52,211,153,0.6)"></div>
@@ -1044,9 +1038,8 @@ with right_col:
             t0 = time.time()
             for ci in range(n_chunks):
                 chunk = df.iloc[ci*CHUNK_SIZE : (ci+1)*CHUNK_SIZE].copy()
-                status_text.markdown(f"<span style='font-family:DM Mono,monospace;font-size:12px;color:#40C8FF'>⚙ Processing chunk {ci+1}/{n_chunks} — rows {ci*CHUNK_SIZE+1:,}–{min((ci+1)*CHUNK_SIZE, len(df)):,}</span>", unsafe_allow_html=True)
+                status_text.markdown(f"<span style='font-family:DM Mono,monospace;font-size:12px;color:#40C8FF'>Processing chunk {ci+1}/{n_chunks} - rows {ci*CHUNK_SIZE+1:,}-{min((ci+1)*CHUNK_SIZE, len(df)):,}</span>", unsafe_allow_html=True)
 
-                # Apply selected options
                 if opt_strip_ws:
                     for col in chunk.select_dtypes(include="object").columns:
                         chunk[col] = chunk[col].str.strip()
@@ -1075,13 +1068,13 @@ with right_col:
                             else:
                                 val = 0
                             chunk[col].fillna(val, inplace=True)
-                            all_steps.append(("null_num", f"Chunk {ci+1} · '{col}': filled {null_cnt} nulls → {null_strategy.lower()} {val:.3g}"))
+                            all_steps.append(("null_num", f"Chunk {ci+1} - '{col}': filled {null_cnt} nulls -> {null_strategy.lower()} {val:.3g}"))
                         else:
                             mode_s = chunk[col].mode()
                             val = mode_s[0] if len(mode_s) else "Unknown"
                             chunk[col].fillna(val, inplace=True)
-                            all_steps.append(("null_txt", f"Chunk {ci+1} · '{col}': filled {null_cnt} nulls → mode '{val}'"))
-                        log_lines.append(f'<div class="log-line"><span class="log-time">{time.strftime("%H:%M:%S")}</span><span class="log-ok">FIX</span><span class="log-text">Chunk {ci+1} · {col}: {null_cnt} nulls filled</span></div>')
+                            all_steps.append(("null_txt", f"Chunk {ci+1} - '{col}': filled {null_cnt} nulls -> mode '{val}'"))
+                        log_lines.append(f'<div class="log-line"><span class="log-time">{time.strftime("%H:%M:%S")}</span><span class="log-ok">FIX</span><span class="log-text">Chunk {ci+1} - {col}: {null_cnt} nulls filled</span></div>')
 
                 cleaned_chunks.append(chunk)
                 progress_bar.progress((ci + 1) / n_chunks)
@@ -1089,34 +1082,34 @@ with right_col:
             elapsed = round(time.time() - t0, 2)
             cleaned_df = pd.concat(cleaned_chunks, ignore_index=True)
             clean_shape = cleaned_df.shape
-            status_text.markdown(f"<span style='font-family:DM Mono,monospace;font-size:12px;color:#34D399'>✓ Done — {len(df):,} rows processed in {elapsed}s</span>", unsafe_allow_html=True)
+            status_text.markdown(f"<span style='font-family:DM Mono,monospace;font-size:12px;color:#34D399'>Done - {len(df):,} rows processed in {elapsed}s</span>", unsafe_allow_html=True)
 
-            # ── Log terminal ──
-            log_html = "\n".join(log_lines) if log_lines else '<div class="log-line"><span class="log-ok">✓</span><span class="log-text">No issues found — dataset is already clean!</span></div>'
+            # Log terminal
+            log_html = "\n".join(log_lines) if log_lines else '<div class="log-line"><span class="log-ok">OK</span><span class="log-text">No issues found - dataset is already clean!</span></div>'
             st.markdown(f'<div class="terminal">{log_html}</div>', unsafe_allow_html=True)
 
-            # ── Post-clean metrics ──
+            # Post-clean metrics
             rows_removed = orig_shape[0] - clean_shape[0]
             pct_retained = round(100 * clean_shape[0] / orig_shape[0], 1)
             c1, c2, c3, c4 = st.columns(4)
             with c1:
-                st.markdown(f"""<div class="metric-card accent4"><div class="metric-icon">✅</div>
+                st.markdown(f"""<div class="metric-card accent4"><div class="metric-icon">&#9989;</div>
                 <div class="metric-value">{clean_shape[0]:,}</div><div class="metric-label">Clean Rows</div></div>""",
                 unsafe_allow_html=True)
             with c2:
-                st.markdown(f"""<div class="metric-card accent3"><div class="metric-icon">🗑️</div>
+                st.markdown(f"""<div class="metric-card accent3"><div class="metric-icon">&#128465;</div>
                 <div class="metric-value">{rows_removed:,}</div><div class="metric-label">Rows Removed</div></div>""",
                 unsafe_allow_html=True)
             with c3:
-                st.markdown(f"""<div class="metric-card accent"><div class="metric-icon">💯</div>
+                st.markdown(f"""<div class="metric-card accent"><div class="metric-icon">&#128175;</div>
                 <div class="metric-value">{pct_retained}%</div><div class="metric-label">Retained</div></div>""",
                 unsafe_allow_html=True)
             with c4:
-                st.markdown(f"""<div class="metric-card accent2"><div class="metric-icon">⚡</div>
+                st.markdown(f"""<div class="metric-card accent2"><div class="metric-icon">&#9889;</div>
                 <div class="metric-value">{elapsed}s</div><div class="metric-label">Process Time</div></div>""",
                 unsafe_allow_html=True)
 
-            # ── AI Report ──
+            # AI Report
             st.markdown("""
             <div class="section-header" style="margin-top:20px">
               <div class="section-dot" style="background:#7B6EF6;box-shadow:0 0 10px rgba(123,110,246,0.6)"></div>
@@ -1134,7 +1127,7 @@ Describe the original dataset size, shape, column count, and what kind of data t
 List and explain every data quality issue found: total missing values, which columns had nulls, duplicate rows found, data type inconsistencies, and severity assessment of each issue.
 
 ## Cleaning Actions Performed
-Explain in detail every cleaning action taken — which columns were fixed, what strategy was used (mean/mode/dedup), how many values were impacted, and why that strategy is appropriate for that column type.
+Explain in detail every cleaning action taken - which columns were fixed, what strategy was used (mean/mode/dedup), how many values were impacted, and why that strategy is appropriate for that column type.
 
 ## Data Quality Score
 Give an overall data quality score out of 100 before and after cleaning. Break it down into sub-scores: Completeness, Consistency, Uniqueness, and Validity. Explain each score.
@@ -1143,14 +1136,14 @@ Give an overall data quality score out of 100 before and after cleaning. Break i
 Describe the statistical impact of the cleaning: rows retained ({pct_retained}%), rows removed ({rows_removed:,}), processing efficiency ({elapsed}s for {orig_shape[0]:,} rows), and what percentage of cells were affected.
 
 ## Recommendations
-Give 4-6 specific, actionable recommendations for improving this dataset further — e.g., data validation rules, collection improvements, additional transformations, or monitoring suggestions.
+Give 4-6 specific, actionable recommendations for improving this dataset further.
 
 ## Conclusion
 Summarize the overall health of the dataset post-cleaning and whether it is ready for analysis or modeling.
 
 --- DATA STATS ---
-Original: {orig_shape[0]:,} rows × {orig_shape[1]} columns
-After cleaning: {clean_shape[0]:,} rows × {clean_shape[1]} columns
+Original: {orig_shape[0]:,} rows x {orig_shape[1]} columns
+After cleaning: {clean_shape[0]:,} rows x {clean_shape[1]} columns
 Rows removed: {rows_removed:,} ({100-pct_retained:.1f}%)
 Processing time: {elapsed}s
 Total missing values fixed: {null_total:,}
@@ -1162,28 +1155,27 @@ Operations log:
 
 Be thorough and specific. Use real numbers from the stats above. Each section should have at least 3-5 sentences of meaningful insight."""
 
-            with st.spinner("🤖 Gemini is writing your detailed report…"):
+            with st.spinner("Gemini is writing your detailed report..."):
                 try:
                     response = model.generate_content(prompt)
                     ai_text = response.text
                 except Exception as e:
                     ai_text = f"## Automated Report\n\n{steps_text}"
 
-            # Parse and render sections beautifully
+            # Parse and render sections
             import re
-            # Normalize: ensure ## sections always split correctly from the very start
             ai_text_norm = re.sub(r'^\s*##\s+', '##SPLIT##', ai_text.strip(), flags=re.MULTILINE)
             raw_sections = ai_text_norm.split('##SPLIT##')
 
             rendered_sections = ""
             section_icons = {
-                "Dataset Overview": "🗂️",
-                "Issues Detected": "🔍",
-                "Cleaning Actions Performed": "🧹",
-                "Data Quality Score": "📊",
-                "Statistical Impact": "📈",
-                "Recommendations": "💡",
-                "Conclusion": "✅",
+                "Dataset Overview": "&#128202;",
+                "Issues Detected": "&#128269;",
+                "Cleaning Actions Performed": "&#129529;",
+                "Data Quality Score": "&#128202;",
+                "Statistical Impact": "&#128200;",
+                "Recommendations": "&#128161;",
+                "Conclusion": "&#9989;",
             }
             section_colors = {
                 "Dataset Overview": "#40C8FF",
@@ -1199,25 +1191,21 @@ Be thorough and specific. Use real numbers from the stats above. Each section sh
                 if not s:
                     continue
                 lines = s.split('\n', 1)
-                # Strip any stray leading # characters from title
                 title = re.sub(r'^#+\s*', '', lines[0]).strip()
                 body  = lines[1].strip() if len(lines) > 1 else ""
-                icon  = section_icons.get(title, "✦")
+                icon  = section_icons.get(title, "&#10022;")
                 color = section_colors.get(title, "#40C8FF")
-                # Skip any preamble chunk that Gemini added before the first ## heading
                 if title not in section_icons and not body:
                     continue
 
-                # Render body lines
                 body_html = ""
                 for line in body.split('\n'):
                     line = line.strip()
                     if not line:
                         continue
-                    # Strip markdown bold **text** for clean HTML display
                     line = re.sub(r'\*\*(.*?)\*\*', r'<strong style="color:#E8EBF4;">\1</strong>', line)
                     if line.startswith('- ') or line.startswith('* '):
-                        body_html += f'<div style="display:flex;gap:10px;margin:6px 0;"><span style="color:{color};flex-shrink:0;margin-top:3px;font-size:11px;">▸</span><span style="color:#A8B0C8;font-size:13.5px;line-height:1.7;">{line[2:]}</span></div>'
+                        body_html += f'<div style="display:flex;gap:10px;margin:6px 0;"><span style="color:{color};flex-shrink:0;margin-top:3px;font-size:11px;">&#9656;</span><span style="color:#A8B0C8;font-size:13.5px;line-height:1.7;">{line[2:]}</span></div>'
                     elif re.match(r'^\d+\.', line):
                         num, rest = line.split('.', 1)
                         body_html += f'<div style="display:flex;gap:10px;margin:8px 0;"><span style="color:{color};font-family:DM Mono,monospace;font-size:11px;font-weight:700;flex-shrink:0;width:22px;padding-top:2px;">{num}.</span><span style="color:#A8B0C8;font-size:13.5px;line-height:1.7;">{rest.strip()}</span></div>'
@@ -1237,28 +1225,33 @@ Be thorough and specific. Use real numbers from the stats above. Each section sh
 
             st.markdown(f"""
             <div class="ai-report">
-              <div class="ai-badge">✦ Gemini AI · Detailed Analysis Report · {datetime.datetime.now().strftime("%H:%M:%S")}</div>
+              <div class="ai-badge">* Gemini AI - Detailed Analysis Report - {datetime.datetime.now().strftime("%H:%M:%S")}</div>
               {rendered_sections}
             </div>
             """, unsafe_allow_html=True)
 
-            # ── Preview cleaned ──
-            with st.expander("🔍 Preview Cleaned Dataset (first 20 rows)"):
-                st.dataframe(cleaned_df.head(20), width='stretch')
+            # Preview cleaned
+            with st.expander("Preview Cleaned Dataset (first 20 rows)"):
+                st.dataframe(cleaned_df.head(20), use_container_width=True)
 
-            # ── Generate PDF ──
+            # Generate PDF
             timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            pdf_bytes = build_pdf_report(
-                orig_shape, clean_shape, col_info_list,
-                all_steps, ai_text, timestamp
-            )
+            try:
+                pdf_bytes = build_pdf_report(
+                    orig_shape, clean_shape, col_info_list,
+                    all_steps, ai_text, timestamp
+                )
+                pdf_ok = True
+            except Exception as e:
+                st.error(f"PDF generation error: {e}")
+                pdf_ok = False
 
-            # ── CSV export ──
+            # CSV export
             csv_buf = io.StringIO()
             cleaned_df.to_csv(csv_buf, index=False)
             csv_bytes = csv_buf.getvalue().encode()
 
-            # ── Download buttons ──
+            # Download buttons
             st.markdown("""
             <div class="section-header" style="margin-top:24px">
               <div class="section-dot" style="background:#40C8FF;box-shadow:0 0 10px rgba(64,200,255,0.6)"></div>
@@ -1269,27 +1262,28 @@ Be thorough and specific. Use real numbers from the stats above. Each section sh
             dl1, dl2 = st.columns(2)
             with dl1:
                 st.download_button(
-                    label="⬇️  Download Cleaned CSV",
+                    label="Download Cleaned CSV",
                     data=csv_bytes,
                     file_name=f"datapulse_cleaned_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.csv",
                     mime="text/csv",
-                    width='stretch'
+                    use_container_width=True
                 )
             with dl2:
-                st.download_button(
-                    label="📄  Download PDF Report",
-                    data=pdf_bytes,
-                    file_name=f"datapulse_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
-                    mime="application/pdf",
-                    width='stretch'
-                )
+                if pdf_ok:
+                    st.download_button(
+                        label="Download PDF Report",
+                        data=pdf_bytes,
+                        file_name=f"datapulse_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
 
-# ── Footer ──
+# Footer
 st.markdown("""
 <div style="text-align:center;padding:32px 0 20px;
   border-top:1px solid rgba(255,255,255,0.05);margin-top:40px">
   <span style="font-family:'DM Mono',monospace;font-size:11px;color:#2A3550;">
-    ✦ Gemini The Data Analyzer · Powered by Google Gemini AI · Built for Scale
+    * Gemini The Data Analyzer - Powered by Google Gemini AI - Built for Scale
   </span>
 </div>
 """, unsafe_allow_html=True)
